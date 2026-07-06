@@ -46,4 +46,3 @@ foreach (var item in items)
 
 File.WriteAllLines(args[1], lines);
 Console.WriteLine($"Done – {items.Count} rows written to {args[1]}");
-return 0;

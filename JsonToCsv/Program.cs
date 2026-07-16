@@ -7,16 +7,43 @@ if (args.Length < 2)
     return 1;
 }
 
-using var input = File.OpenRead(args[0]);
-using var writer = new StreamWriter(args[1], append: false, Encoding.UTF8, bufferSize: 1 << 16);
+string inputPath = Path.GetFullPath(args[0]);
+string outputPath = Path.GetFullPath(args[1]);
 
-int count = JsonToCsvConverter.Convert(input, writer);
-
-if (count == 0)
+if (!File.Exists(inputPath))
 {
-    Console.WriteLine("No items found.");
-    return 1;
+    Console.Error.WriteLine($"Error: input file not found: {inputPath}");
+    return 2;
 }
 
-Console.WriteLine($"Done – {count} rows written to {args[1]}");
-return 0;
+try
+{
+    using var input = File.OpenRead(inputPath);
+    using var writer = new StreamWriter(outputPath, append: false, Encoding.UTF8, bufferSize: 1 << 16);
+
+    int count = JsonToCsvConverter.Convert(input, writer);
+
+    if (count == 0)
+    {
+        Console.WriteLine("No items found.");
+        return 1;
+    }
+
+    Console.WriteLine($"Done – {count} rows written to {outputPath}");
+    return 0;
+}
+catch (System.Text.Json.JsonException ex)
+{
+    Console.Error.WriteLine($"Error: '{inputPath}' is not valid JSON. {ex.Message}");
+    return 3;
+}
+catch (InvalidOperationException ex)
+{
+    Console.Error.WriteLine($"Error: unsupported JSON structure. {ex.Message}");
+    return 4;
+}
+catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+{
+    Console.Error.WriteLine($"Error: {ex.Message}");
+    return 5;
+}

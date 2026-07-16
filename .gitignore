@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/JsonToCsv/bin/Debug/net10.0
+/JsonToCsv/obj/Debug/net10.0
+/JsonToCsv/obj
+/obj
+/Tests/bin/Debug/net10.0
+/Tests/obj
+/bin/Debug/net10.0
+/.vs

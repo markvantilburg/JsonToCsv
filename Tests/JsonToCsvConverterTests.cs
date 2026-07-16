@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using NUnit.Framework;
-using JsonToCsv;
 
 namespace JsonToCsv.Tests;
 

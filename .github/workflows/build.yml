@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore JsonToCsv.slnx
+
+      - name: Build
+        run: dotnet build JsonToCsv.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --solution JsonToCsv.slnx --configuration Release --no-build
+
+      - name: Publish
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet publish JsonToCsv/JsonToCsv.csproj --configuration Release --no-build --output publish
+
+      - name: Upload artifact
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: JsonToCsv
+          path: publish/

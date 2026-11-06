@@ -1,5 +1,7 @@
 # JsonToCsv
 
+[![Build](https://github.com/markvantilburg/JsonToCsv/actions/workflows/build.yml/badge.svg)](https://github.com/markvantilburg/JsonToCsv/actions/workflows/build.yml)
+
 Command-line tool to convert a JSON file to a semicolon-separated CSV file.
 
 ## Usage

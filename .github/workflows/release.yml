@@ -21,7 +21,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            10.0.x
+            11.0.x
 
       - name: Get version
         id: version
@@ -33,23 +35,26 @@ jobs:
       - name: Publish
         run: |
           mkdir -p dist
-          for rid in win-x64 win-arm64 linux-x64 linux-arm64 osx-x64 osx-arm64; do
-            dotnet publish JsonToCsv/JsonToCsv.csproj \
-              --configuration Release \
-              --runtime "$rid" \
-              --self-contained true \
-              --output "out/$rid" \
-              -p:PublishSingleFile=true \
-              -p:IncludeNativeLibrariesForSelfExtract=true \
-              -p:DebugType=None \
-              -p:Version=${{ steps.version.outputs.version }}
+          for tfm in net10.0 net11.0; do
+            for rid in win-x64 win-arm64 linux-x64 linux-arm64 osx-x64 osx-arm64; do
+              dotnet publish JsonToCsv/JsonToCsv.csproj \
+                --configuration Release \
+                --framework "$tfm" \
+                --runtime "$rid" \
+                --self-contained true \
+                --output "out/$tfm/$rid" \
+                -p:PublishSingleFile=true \
+                -p:IncludeNativeLibrariesForSelfExtract=true \
+                -p:DebugType=None \
+                -p:Version=${{ steps.version.outputs.version }}
 
-            name="JsonToCsv-${{ steps.version.outputs.version }}-$rid"
-            if [[ "$rid" == win-* ]]; then
-              (cd "out/$rid" && zip -q "../../dist/$name.zip" *)
-            else
-              tar -czf "dist/$name.tar.gz" -C "out/$rid" .
-            fi
+              name="JsonToCsv-${{ steps.version.outputs.version }}-$tfm-$rid"
+              if [[ "$rid" == win-* ]]; then
+                (cd "out/$tfm/$rid" && zip -q "../../../dist/$name.zip" *)
+              else
+                tar -czf "dist/$name.tar.gz" -C "out/$tfm/$rid" .
+              fi
+            done
           done
 
       - name: Create release

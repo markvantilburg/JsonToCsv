@@ -29,6 +29,7 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
 
       - name: Restore
         run: dotnet restore JsonToCsv.slnx
@@ -41,7 +42,7 @@ jobs:
 
       - name: Publish
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet publish JsonToCsv/JsonToCsv.csproj --configuration Release --no-build --output publish
+        run: dotnet publish JsonToCsv/JsonToCsv.csproj --configuration Release --no-build --framework net11.0 --output publish
 
       - name: Upload artifact
         if: matrix.os == 'ubuntu-latest'
